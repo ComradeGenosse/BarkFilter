@@ -1,0 +1,2 @@
+IMPORTANT: These are synthetic fixtures. 'baseline_ducked' simply turns down EVERY sound during a known simulated-bark interval (including dialogue/music). The 'oracle_clean' reference is from the original unmixed signal, NOT an AI result. None of these WAVs demonstrate AI bark removal.
+Run barkfilter with a downloaded SAM model to produce genuine AI outputs, then evaluate those outputs.

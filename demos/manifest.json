@@ -1,0 +1,101 @@
+{
+  "description": "SYNTHETIC source stems; not canine recordings; NOT AI outputs",
+  "rate": 24000,
+  "duration_sec": 6.0,
+  "speech": "espeak synthetic TTS if available, else voiced-tone fallback",
+  "music": "original procedural notes",
+  "bark": "original procedural bark-LIKE waveform",
+  "baseline": "ground-truth-span waveform ducking; reduces EVERYTHING during spans",
+  "examples": {
+    "speech_overlap": {
+      "files": {
+        "input": "speech_overlap_input.wav",
+        "baseline_ducked": "speech_overlap_baseline_ducked.wav",
+        "oracle_clean_NOT_MODEL": "speech_overlap_oracle_clean_NOT_MODEL.wav"
+      },
+      "spans": "speech_overlap_spans.json",
+      "simulated_events": 3
+    },
+    "music_overlap": {
+      "files": {
+        "input": "music_overlap_input.wav",
+        "baseline_ducked": "music_overlap_baseline_ducked.wav",
+        "oracle_clean_NOT_MODEL": "music_overlap_oracle_clean_NOT_MODEL.wav"
+      },
+      "spans": "music_overlap_spans.json",
+      "simulated_events": 3
+    },
+    "action_sfx": {
+      "files": {
+        "input": "action_sfx_input.wav",
+        "baseline_ducked": "action_sfx_baseline_ducked.wav",
+        "oracle_clean_NOT_MODEL": "action_sfx_oracle_clean_NOT_MODEL.wav"
+      },
+      "spans": "action_sfx_spans.json",
+      "simulated_events": 2
+    },
+    "other_animals": {
+      "files": {
+        "input": "other_animals_input.wav",
+        "baseline_ducked": "other_animals_baseline_ducked.wav",
+        "oracle_clean_NOT_MODEL": "other_animals_oracle_clean_NOT_MODEL.wav"
+      },
+      "spans": "other_animals_spans.json",
+      "simulated_events": 2
+    },
+    "multiple_dogs": {
+      "files": {
+        "input": "multiple_dogs_input.wav",
+        "baseline_ducked": "multiple_dogs_baseline_ducked.wav",
+        "oracle_clean_NOT_MODEL": "multiple_dogs_oracle_clean_NOT_MODEL.wav"
+      },
+      "spans": "multiple_dogs_spans.json",
+      "simulated_events": 4
+    },
+    "brief_bark": {
+      "files": {
+        "input": "brief_bark_input.wav",
+        "baseline_ducked": "brief_bark_baseline_ducked.wav",
+        "oracle_clean_NOT_MODEL": "brief_bark_oracle_clean_NOT_MODEL.wav"
+      },
+      "spans": "brief_bark_spans.json",
+      "simulated_events": 1
+    },
+    "quiet_bark": {
+      "files": {
+        "input": "quiet_bark_input.wav",
+        "baseline_ducked": "quiet_bark_baseline_ducked.wav",
+        "oracle_clean_NOT_MODEL": "quiet_bark_oracle_clean_NOT_MODEL.wav"
+      },
+      "spans": "quiet_bark_spans.json",
+      "simulated_events": 2
+    },
+    "overlapping_words_HARD": {
+      "files": {
+        "input": "overlapping_words_HARD_input.wav",
+        "baseline_ducked": "overlapping_words_HARD_baseline_ducked.wav",
+        "oracle_clean_NOT_MODEL": "overlapping_words_HARD_oracle_clean_NOT_MODEL.wav"
+      },
+      "spans": "overlapping_words_HARD_spans.json",
+      "simulated_events": 5
+    },
+    "NO_BARK": {
+      "files": {
+        "input": "NO_BARK_input.wav",
+        "baseline_ducked": "NO_BARK_baseline_ducked.wav",
+        "oracle_clean_NOT_MODEL": "NO_BARK_oracle_clean_NOT_MODEL.wav"
+      },
+      "spans": "NO_BARK_spans.json",
+      "simulated_events": 0
+    },
+    "false_positive_percussion": {
+      "files": {
+        "input": "false_positive_percussion_input.wav",
+        "baseline_ducked": "false_positive_percussion_baseline_ducked.wav",
+        "oracle_clean_NOT_MODEL": "false_positive_percussion_oracle_clean_NOT_MODEL.wav"
+      },
+      "spans": "false_positive_percussion_spans.json",
+      "simulated_events": 0
+    }
+  }
+}

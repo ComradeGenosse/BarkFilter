@@ -1,0 +1,32 @@
+PROJECT BARKFILTER - PHASE 0A - 2026-10-19
+==========================================
+
+READ README.md FOR COMPLETE WINDOWS 11 SETUP, LICENSES AND TESTS.
+
+Current technical status:
+- The offline processing pipeline, GGUF and official SAM model adapters,
+  YAMNet detector adapters, WAV/video I/O and benchmark scripts are implemented.
+- 16 automated tests PASSED in the current Linux CPU environment.
+- 10 synthetic *non-AI* before/ducking/reference comparison sets can be generated with `python -m barkfilter.demos --output-dir demos`; WAVs are omitted from Git.
+- THERE IS NO ACTUAL SAM MODEL WEIGHT IN THE ARCHIVE.
+- THE REAL AI REMOVAL AND RTX 5090 PERFORMANCE HAVE NOT BEEN TESTED.
+- The included identity and manually ducked WAVs are NOT AI outputs.
+
+Windows quick commands (after installing Python 3.11 and FFmpeg):
+    py -3.11 -m venv .venv
+    .\.venv\Scripts\Activate.ps1
+    pip install -e ".[test]"
+    python -m pytest -q
+
+For REAL bark removal, download an appropriate SAM weight file and compatible
+runtime and follow the full commands in README.md. For detector use
+small YAMNet-ONNX option, not mandatory TensorFlow.
+
+Streaming decision: NO-GO for claiming 3-10s live buffering has been proven.
+Next gate: run actual SAM separation and benchmark on the RTX 5090.
+
+GITHUB-READY PACKAGE
+========================================
+Includes .gitignore to exclude local models, credentials, and generated outputs,
+and .github/workflows/tests.yml for Windows/Linux unit tests on push.
+These CI tests do NOT validate neural bark removal or RTX 5090 inference.

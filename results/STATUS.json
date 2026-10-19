@@ -1,0 +1,17 @@
+{
+  "project": "BarkFilter Phase 0A",
+  "date": "2026-10-19",
+  "proof_of_concept_software": "Implemented and tested (the actual SAM model path is unexecuted)",
+  "automated_tests_passed": 16,
+  "detector": "Mock-only ONNX adapter test; real pretrained detector not executed",
+  "AI_bark_separation_executed": false,
+  "AI_bark_separation_quality_measured": false,
+  "RTX_5090_GPU_access": false,
+  "RTX_5090_benchmark_measured": false,
+  "sustained_model_speed_measured": false,
+  "synthetic_fixture_scenarios": 10,
+  "synthetic_fixtures_are_real_dog_recordings": false,
+  "baseline_ducked_is_AI": false,
+  "streaming_3_to_10s_GO": false,
+  "decision": "NO-GO for a claim of live streaming feasibility; GO for on-device Phase 0A acceptance experiment"
+}

@@ -1,0 +1,38 @@
+# Python tooling
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+
+# Local model files and third-party downloads
+models/
+samples/
+*.gguf
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+*.onnx
+
+# Locally processed audio, logs, and benchmarks
+results/*.wav
+results/*_processed.*
+results/*_trace.json
+results/*_benchmark.json
+*.log
+
+# OS and IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Reproducible synthetic audio generated on demand
+demos/*.wav
