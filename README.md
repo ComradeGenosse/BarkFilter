@@ -291,3 +291,10 @@ python -m barkfilter.detector_benchmark --download --esc10 --output-dir results/
 ```
 
 The `report.json` preserves the details of every attempted case and setup errors, and returns a nonzero exit code for failures. The `.github/workflows/tests.yml` unit-test workflow remains independent.
+
+
+### Real-dog mixture benchmark (automated)
+
+The workflow now also downloads **two real ESC-10 dog recordings** (CC BY 3.0), overlays them on reproducible procedural speech and music, and processes a no-bark control. Original, processed and clean-reference WAVs, per-case objective metrics, source URLs and SHA-256 digests are included in artifacts; `ESC50_UPSTREAM_LICENSE.txt` preserves attribution information. **The source dog recordings can themselves include background noise**, so subtracting the mixture difference is not a pure bark-isolation metric. CPU CI runs the identity baseline only; real removal requires the opt-in SAM GPU job.
+
+Run it locally with `python -m barkfilter.real_mixtures --backend identity --mode hybrid --window 4 --overlap 1 --output-dir results/real_dog`.

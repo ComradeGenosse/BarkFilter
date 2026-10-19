@@ -55,6 +55,12 @@ jobs:
         run: python -m pip install '.[onnx-detector]' huggingface_hub
       - name: Exercise real ONNX classifier (synthetic events, not real dogs)
         run: python -m barkfilter.detector_benchmark --download --esc10 --output-dir results/autonomous
+      - name: Prepare and evaluate authentic dog over synthetic speech/music (identity control only)
+        run: >-
+          python -m barkfilter.real_mixtures
+          --backend identity --mode hybrid --detector manual
+          --window 4 --overlap 1
+          --output-dir results/autonomous/real_dog
       - name: Publish job summary
         if: always()
         shell: bash

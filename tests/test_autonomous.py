@@ -74,3 +74,32 @@ def test_esc10_benchmark_selects_fixed_licensed_subset():
     assert all(x["esc10"] == "True" for x in sampled)
     with pytest.raises(ValueError):
         choose_esc10_samples("\n".join(rows), per_category=4)
+
+
+def test_real_dog_mixture_generation_and_control(tmp_path):
+    from barkfilter.real_mixtures import build_mixtures, ESC50_RAW
+    from barkfilter.audio import read_audio, write_audio
+    import io
+    import soundfile as sf
+    import numpy as np
+    # Deterministic, self-contained fake ESC-10 downloads; no network in unit tests.
+    dog=np.sin(np.linspace(0, 500, 44100,dtype=np.float32))*.3
+    buf=io.BytesIO();sf.write(buf,dog,44100,format="WAV")
+    wav=buf.getvalue()
+    metadata=("filename,fold,target,category,esc10,src_file,take\n"
+              "dog-a.wav,1,0,dog,True,a,A\n"
+              "dog-b.wav,1,0,dog,True,b,A\n"
+              + "".join(f"{i}-{c}.wav,1,1,{c},True,{c},A\n" for c in
+                        ("rooster","crying_baby","chainsaw","clock_tick") for i in range(2)))
+    def fake_get(url):
+        if url.endswith("esc50.csv"):return metadata.encode()
+        if url.endswith("LICENSE"):return b"CC BY test fixture"
+        return wav
+    m=build_mixtures(tmp_path,fetch=fake_get)
+    assert len(m["cases"])==3
+    assert m["cases"]["speech_real_dog"]["dog_credit"]["license"]=="ESC-10 CC BY 3.0"
+    control=m["cases"]["NO_BARK_clean_control"]["files"]
+    a,_=read_audio(tmp_path/control["original"])
+    b,_=read_audio(tmp_path/control["clean_reference"])
+    assert np.array_equal(a,b)
+    assert (tmp_path/"ESC50_UPSTREAM_LICENSE.txt").is_file()

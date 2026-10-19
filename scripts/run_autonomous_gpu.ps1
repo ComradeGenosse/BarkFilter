@@ -53,6 +53,11 @@ python -m barkfilter.autonomous --backend sam-gguf --cli $AudioCpp --model $Mode
   --output-dir $OutputDir
 if ($LASTEXITCODE -ne 0) { Write-FailureRecord 'SAM end-to-end suite failed; inspect report.json.' }
 
+python -m barkfilter.real_mixtures --backend sam-gguf --cli $AudioCpp --model $Model `
+  --device cuda --mono --mode continuous --window 4 --overlap 1 `
+  --output-dir (Join-Path $OutputDir 'real_dog')
+if ($LASTEXITCODE -ne 0) { Write-FailureRecord 'REAL-dog-over-dialogue/music mixture benchmark failed; see real_dog_report.json.' }
+
 $benchInput = Join-Path $OutputDir 'synthetic_inputs/speech_overlap_input.wav'
 python -m barkfilter.benchmark --input $benchInput --backend sam-gguf `
   --cli $AudioCpp --model $Model --device cuda --mono --mode continuous `
