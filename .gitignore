@@ -36,3 +36,7 @@ Thumbs.db
 
 # Reproducible synthetic audio generated on demand
 demos/*.wav
+
+# Autonomously generated test and benchmark artifacts
+results/autonomous/
+results/gpu/

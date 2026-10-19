@@ -1,0 +1,105 @@
+name: BarkFilter unattended benchmarks
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'barkfilter/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - '.github/workflows/autonomous-benchmarks.yml'
+  workflow_dispatch:
+    inputs:
+      run_gpu:
+        description: 'Run REAL SAM Audio on the self-hosted Windows GPU (requires configured runner/model)'
+        type: boolean
+        default: false
+  schedule:
+    - cron: '17 7 * * 1'  # Weekly baseline regression, UTC
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic-baseline:
+    name: CPU infrastructure benchmark / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install project
+        run: python -m pip install -e '.[test]'
+      - name: Run all unit tests
+        run: python -m pytest -q
+      - name: Run unattended synthetic benchmark
+        run: >-
+          python -m barkfilter.autonomous
+          --backend identity --mode hybrid --mono --window 4 --overlap 1
+          --output-dir results/autonomous
+      - name: Run CPU-only wrapper throughput benchmark
+        run: >-
+          python -m barkfilter.benchmark
+          --backend identity --mode continuous --mono
+          --input results/autonomous/synthetic_inputs/speech_overlap_input.wav
+          --durations 4,8,16 --windows 4,8 --overlap 1 --repeats 1
+          --output-json results/autonomous/CPU_WRAPPER_ONLY_benchmark.json
+      - name: Download YAMNet ONNX for real CPU detection tests
+        run: python -m pip install '.[onnx-detector]' huggingface_hub
+      - name: Exercise real ONNX classifier (synthetic events, not real dogs)
+        run: python -m barkfilter.detector_benchmark --download --output-dir results/autonomous
+      - name: Publish job summary
+        if: always()
+        shell: bash
+        run: |
+          if [ -f results/autonomous/SUMMARY.md ]; then cat results/autonomous/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"; fi
+      - name: Upload complete result bundle
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cpu-synthetic-${{ matrix.os }}
+          path: results/autonomous/
+          if-no-files-found: warn
+          retention-days: 14
+
+  actual-rtx-gpu:
+    if: github.event_name == 'workflow_dispatch' && inputs.run_gpu == true
+    name: Real SAM GGUF / Windows GPU
+    runs-on: [self-hosted, Windows, X64, barkfilter-gpu]
+    timeout-minutes: 180
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install project and test requirements
+        run: python -m pip install -e '.[test]'
+      - name: Validate GPU and local model; run end-to-end suite
+        env:
+          BARKFILTER_AUDIOCPP: ${{ vars.BARKFILTER_AUDIOCPP_PATH }}
+          BARKFILTER_MODEL: ${{ vars.BARKFILTER_GGUF_MODEL_PATH }}
+        run: ./scripts/run_autonomous_gpu.ps1 -OutputDir results/gpu -RequireRtx5090
+      - name: Publish summary
+        if: always()
+        run: |
+          if (Test-Path 'results/gpu/SUMMARY.md') {
+            Get-Content 'results/gpu/SUMMARY.md' | Out-File -Append -Encoding utf8 $env:GITHUB_STEP_SUMMARY
+          }
+      - name: Upload benchmark artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: real-sam-rtx5090
+          path: results/gpu/
+          if-no-files-found: warn
+          retention-days: 14

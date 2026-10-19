@@ -265,3 +265,29 @@ DRM/audio-capture constraints and TV routing **after** separation quality is pro
 **Constraints:** The project is offline-only; no streaming interface, no browser
 extension, no television integration and no cloud inference. No other project or
 repository was modified.
+
+### Git repository audio policy
+
+Generated synthetic demo WAVs are intentionally omitted from Git history. Create all ten original/baseline/oracle comparison sets using `python -m barkfilter.demos --output-dir demos`. The oracle-clean files are synthetic ground truth, **not** AI predictions. No pretrained weights are committed.
+
+## Unattended tests and benchmarks (Phase 0A automation)
+
+Workflow: [BarkFilter unattended benchmarks](https://github.com/ComradeGenosse/BarkFilter/actions/workflows/autonomous-benchmarks.yml).
+
+- **Automatically on relevant pushes and every Monday at 07:17 UTC:** GitHub-hosted **Windows and Linux** runners install the package, run all Python tests, regenerate the ten synthetic mixtures, measure identity/hybrid pipeline behavior, exercise the **actual ONNX YAMNet classifier** (public ~16 MB download), and benchmark CPU wrapper/overlap overhead. Each job uploads its self-contained JSON/WAV result bundle and Markdown summary (14-day retention). These results are NOT dog bark source separation. The YAMNet test exercises real inference on artificial sounds; it does not establish detector precision/recall on authentic dogs.
+- **Optional real GPU run, after one-time PC setup:** GitHub Actions → `BarkFilter unattended benchmarks` → Run workflow → `run_gpu=true`. This targets a **self-hosted Windows x64 runner** with custom `barkfilter-gpu` label. It requires a registered runner with the RTX 5090 available, NVIDIA drivers, the CUDA-enabled `audiocpp_cli.exe`, the GGUF model stored locally, and repo variables `BARKFILTER_AUDIOCPP_PATH` and `BARKFILTER_GGUF_MODEL_PATH` pointing to the respective absolute Windows paths. Follow GitHub's [self-hosted runner instructions](https://docs.github.com/en/actions/how-tos/manage-runners/self-hosted-runners/add-runners). Do not run untrusted pull requests on a personal GPU runner. Only workflow-dispatch jobs target it.
+- **Run the same full GPU test without GitHub Actions (local Windows/remote desktop):** `python -m pip install -e ".[test]"`, then `$env:BARKFILTER_AUDIOCPP="C:\\path\\audiocpp_cli.exe"; $env:BARKFILTER_MODEL="C:\\path\\sam-audio-small-q8_0.gguf"; ./scripts/run_autonomous_gpu.ps1 -RequireRtx5090`.
+
+GPU output includes a preflight file, six-minute synthetic-case breakdown (four selected 6-second cases), residual WAV outputs, detailed per-window process durations and CPU/RAM/VRAM samples, plus 4/8/16-second GGUF benchmarks. This intentionally **reloads the GGUF model on each separate chunk**, so it is **not** a sustained warm streaming measurement. Long-duration real canine samples and subjective speech/music review remain required before a live streaming GO decision. No approved/gated model is downloaded automatically or redistributed. Never treat identity results, procedural barks, or generated oracle stems as model quality evidence.
+
+To run the CPU suite yourself without a GPU:
+
+```powershell
+python -m pip install -e ".[test]"
+python -m pytest -q
+python -m barkfilter.autonomous --backend identity --mode hybrid --mono --window 4 --overlap 1 --output-dir results/autonomous
+python -m pip install -e ".[onnx-detector]" huggingface_hub
+python -m barkfilter.detector_benchmark --download --output-dir results/autonomous
+```
+
+The `report.json` preserves the details of every attempted case and setup errors, and returns a nonzero exit code for failures. The `.github/workflows/tests.yml` unit-test workflow remains independent.
