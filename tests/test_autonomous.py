@@ -60,3 +60,17 @@ def test_yamnet_detector_benchmark_failure_report(tmp_path):
     result = run(tmp_path, model_path="not-present.onnx", class_map="not-present.csv")
     assert result["status"] == "error"
     assert "error" in json.loads((tmp_path / "detector_report.json").read_text())
+
+
+def test_esc10_benchmark_selects_fixed_licensed_subset():
+    from barkfilter.detector_benchmark import choose_esc10_samples, ESC10_CATEGORIES
+    rows = ["filename,fold,target,category,esc10,src_file,take"]
+    for cat in ESC10_CATEGORIES:
+        for i in range(3):
+            rows.append(f"{i}-{cat}.wav,1,0,{cat},True,foo,A")
+        rows.append(f"other-{cat}.wav,1,0,{cat},False,foo,A")
+    sampled = choose_esc10_samples("\n".join(rows), per_category=2)
+    assert len(sampled) == len(ESC10_CATEGORIES) * 2
+    assert all(x["esc10"] == "True" for x in sampled)
+    with pytest.raises(ValueError):
+        choose_esc10_samples("\n".join(rows), per_category=4)
